@@ -59,6 +59,11 @@ export async function appendScriptTag({ locationUrl, getMetadata, createTag, get
       .then((videoObject) => append(videoObject))
       .catch((e) => logError(e.message)));
   }
+  const seotechVideoObject = getMetadata('seotech-video-object');
+  if (seotechVideoObject) {
+    append(seotechVideoObject);
+  }
+
   return Promise.all(promises);
 }
 

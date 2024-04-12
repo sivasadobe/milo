@@ -1013,7 +1013,7 @@ async function documentPostSectionLoading(config) {
   if (appendage) {
     import('../features/title-append/title-append.js').then((module) => module.default(appendage));
   }
-  if (getMetadata('seotech-structured-data') === 'on' || getMetadata('seotech-video-url')) {
+  if (getMetadata('seotech-structured-data') === 'on' || getMetadata('seotech-video-url') || getMetadata('seotech-video-object')) {
     import('../features/seotech/seotech.js').then((module) => module.default(
       { locationUrl: window.location.href, getMetadata, createTag, getConfig },
     ));
