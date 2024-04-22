@@ -54,10 +54,33 @@ export async function appendScriptTag({ locationUrl, getMetadata, createTag, get
       .then((objects) => objects.forEach((obj) => append(obj)))
       .catch((e) => logError(e.message)));
   }
-  if (getMetadata('seotech-video-url')) {
-    promises.push(getVideoObject(getMetadata('seotech-video-url'), seotechAPIUrl)
-      .then((videoObject) => append(videoObject))
-      .catch((e) => logError(e.message)));
+
+  const seoTechVideoURL = getMetadata('seotech-video-url') ?? '';
+  if (seoTechVideoURL) {
+    if (seoTechVideoURL.includes('.mp4')) {
+      const videoFullPath = new URL(seoTechVideoURL).pathname;
+      const videoPath = videoFullPath.substring(0, videoFullPath.lastIndexOf('/'));
+      const jsonFileName = videoFullPath.substring(videoFullPath.lastIndexOf('/') + 1).replace('.mp4', '.json');
+
+      const [videoNameRes, videoSeoRes] = await Promise.allSettled([
+        fetch(`${videoPath}/${jsonFileName}`),
+        fetch(`${videoPath}/video-seo.json`),
+      ]);
+      if (videoNameRes.status === 'rejected' && videoSeoRes.status === 'rejected') return;
+
+      const seoJson = videoNameRes.status === 'fulfilled' ? await videoNameRes.value.json() : await videoSeoRes.value.json();
+      const { createVideoObject } = await import('../../blocks/video-metadata/video-metadata.js');
+      const seoJsonDataIndex = seoJson.data.findIndex((ele) => new URL(ele['content-url'] || ele['embed-url']).pathname === videoFullPath);
+      if (seoJsonDataIndex === -1) return;
+
+      const videoObject = createVideoObject(seoJson.data[seoJsonDataIndex]);
+
+      append(videoObject);
+    } else {
+        promises.push(getVideoObject(getMetadata('seotech-video-url'), seotechAPIUrl)
+          .then((videoObject) => append(videoObject))
+          .catch((e) => logError(e.message)));
+    }
   }
   return Promise.all(promises);
 }

@@ -69,7 +69,7 @@ function addSeekToActionField(videoObj, blockKey, blockValue) {
 export function createVideoObject(blockMap) {
   const video = {};
   Object.entries(blockMap).forEach(([key, val]) => {
-    const blockVal = val.content && val.content.textContent.trim();
+    const blockVal = typeof val === 'string' ? val : val?.content?.textContent?.trim();
     if (!blockVal) return;
     const blockKey = key && key.replaceAll(' ', '-');
     switch (true) {
