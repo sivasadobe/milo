@@ -668,7 +668,15 @@ export function decorateLinks(el) {
   const links = [...anchors].reduce((rdx, a) => {
     appendHtmlToLink(a);
     a.href = localizeLink(a.href);
+    const url = new URL(a.href);
+    console.log('url.href', url.href);
     decorateSVG(a);
+    const labelText = url.searchParams.get('label_text');
+    if (labelText) {
+      a.setAttribute('aria-label', labelText);
+      url.searchParams.delete('label_text');
+      a.href = url.href;
+    }
     if (a.href.includes('#_blank')) {
       a.setAttribute('target', '_blank');
       a.href = a.href.replace('#_blank', '');
