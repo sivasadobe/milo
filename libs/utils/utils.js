@@ -669,7 +669,6 @@ export function decorateLinks(el) {
     appendHtmlToLink(a);
     a.href = localizeLink(a.href);
     const url = new URL(a.href);
-    console.log('url.href', url.href);
     decorateSVG(a);
     const labelText = url.searchParams.get('label_text');
     if (labelText) {
